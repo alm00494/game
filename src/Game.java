@@ -24,42 +24,22 @@ public class Game extends GameCore {
     // Useful game constants
     static int screenWidth = 512;
     static int screenHeight = 400;
-
-    // Game constants
-    float lift = 0.005f;
     float gravity = 0.001f;
-    float fly = -0.4f;
+    float jumpVelocity = -0.4f;
     float moveSpeed = 0.2f;
-
-    // Game state flags
-    //boolean jump = false;
-    //boolean moveRight = false;
-    //boolean moveLeft = false;
-    //boolean attack = false;
     boolean debug = true;
-    //boolean onGround = true;
-
     long lastAttack = 10000;
-    long lastJump = 10000;
 
     // Game resources
-    Animation standing, running, jumping, death, attacking;
-
-    Animation thugStanding, thugRunning, thugJumping, thugDeath, thugAttacking;
-
+    Animation playerIdle, playerRunning, playerJumping, playerDeath, playerAttacking, stab, knifeRun;
+    Animation thugIdle, thugRunning, thugDeath, thugAttacking;
     BufferedImage bgImage1, bgImage2, bgImage3, youDiedImage;
-
-
     Sprite player = null;
     Sprite thug = null;
     ArrayList<Sprite> clouds = new ArrayList<Sprite>();
-
     TileMap tmap = new TileMap();    // Our tile map, note that we load it in init()
-
     long total;                    // The score will be the total time elapsed since a crash
-
-    int attackAnimationDuration = 1000; // 1 second in milliseconds
-    long attackStartTime = 0;
+    private Sprite knife;
 
     /**
      * The obligatory main method that creates
@@ -68,7 +48,6 @@ public class Game extends GameCore {
      * @param args The list of parameters this program might use (ignored)
      */
     public static void main(String[] args) {
-
         Game gct = new Game();
         gct.init();
         // Start in windowed mode with the given screen height and width
@@ -86,45 +65,52 @@ public class Game extends GameCore {
      */
     public void init() {
         Sprite s;    // Temporary reference to a sprite
-
         // Load the tile map and print it out so we can check it is valid
         tmap.loadMap("maps", "map.txt");
-
         setSize(tmap.getPixelWidth() / 4, tmap.getPixelHeight());
         setVisible(true);
 
         // Create a set of background sprites that we can
         // rearrange to give the illusion of motion
 
-        standing = new Animation();
-        standing.loadAnimationFromSheet("images/Biker_idle.png", 4, 1, 60);
+        playerIdle = new Animation();
+        playerIdle.loadAnimationFromSheet("images/player/idle.png", 4, 1, 60);
 
-        attacking = new Animation();
-        attacking.loadAnimationFromSheet("images/Biker_attack1.png", 6, 1, 60);
+        playerAttacking = new Animation();
+        playerAttacking.loadAnimationFromSheet("images/player/punch.png", 6, 1, 60);
 
-        running = new Animation();
-        running.loadAnimationFromSheet("images/biker_run.png", 6, 1, 60);
+        playerRunning = new Animation();
+        playerRunning.loadAnimationFromSheet("images/player/run.png", 6, 1, 60);
 
-        jumping = new Animation();
-        jumping.loadAnimationFromSheet("images/Biker_jump.png", 4, 1, 60);
+        playerJumping = new Animation();
+        playerJumping.loadAnimationFromSheet("images/player/jump.png", 4, 1, 60);
 
-        death = new Animation();
-        death.loadAnimationFromSheet("images/Biker_death.png", 6, 1, 60);
+        playerDeath = new Animation();
+        playerDeath.loadAnimationFromSheet("images/player/death.png", 6, 1, 60);
+        playerDeath.setLoop(false);
 
-        thugStanding = new Animation();
-        thugStanding.loadAnimationFromSheet("images/Thug_idle.png", 4, 1, 60);
+        thugIdle = new Animation();
+        thugIdle.loadAnimationFromSheet("images/thug/Thug_idle.png", 4, 1, 60);
 
         thugRunning = new Animation();
-        thugRunning.loadAnimationFromSheet("images/Thug_Walk.png", 6, 1, 60);
+        thugRunning.loadAnimationFromSheet("images/thug/Thug_Walk.png", 6, 1, 60);
 
         thugAttacking = new Animation();
-        thugAttacking.loadAnimationFromSheet("images/Thug_attack1.png", 6, 1, 60);
+        thugAttacking.loadAnimationFromSheet("images/thug/Thug_attack1.png", 6, 1, 60);
 
         thugDeath = new Animation();
-        thugDeath.loadAnimationFromSheet("images/Death.png", 6, 1, 60);
+        thugDeath.loadAnimationFromSheet("images/thug/Death.png", 6, 1, 60);
+
+        stab = new Animation();
+        stab.loadAnimationFromSheet("images/player/knifeStab.png", 6, 1, 60);
+
+        knifeRun = new Animation();
+        knifeRun.loadAnimationFromSheet("images/player/knifeRun.png", 6, 1, 60);
 
         // Initialise the player with an animation
-        player = new Sprite(standing);
+        player = new Sprite(playerIdle);
+
+        knife = new Sprite(knifeRun);
 
         // Initialise the thug with an animation
         thug = new Sprite(thugRunning);
@@ -156,9 +142,12 @@ public class Game extends GameCore {
     public void initialiseGame() {
         total = 0;
 
-        player.setPosition(200, 550);
+        player.setPosition(100, 250);
         player.setVelocity(0, 0);
         player.show();
+
+        knife.setPosition(player.getX(), player.getY());
+        knife.show();
 
         thug.setPosition(500, 200);
         thug.setVelocity(-0.1f, 0);
@@ -180,7 +169,7 @@ public class Game extends GameCore {
         // First work out how much we need to shift the view in order to
         // see where the player is. To do this, we adjust the offset so that
         // it is relative to the player's position along with a shift
-        int xo = -(int) player.getX() + 200;
+        int xo = -(int) player.getX() + 450;
         int yo = 0; //-(int)player.getY() + 200;
 
         //draw the background using background.png
@@ -201,7 +190,6 @@ public class Game extends GameCore {
         at.scale(1.1, 1.1);
         bgImage1 = new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR).filter(bgImage1, null);
         bgImage3 = new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR).filter(bgImage3, null);
-
 
         //scale the you_died image
         AffineTransform at2 = new AffineTransform();
@@ -238,6 +226,7 @@ public class Game extends GameCore {
             int y = getHeight() - bgHeight;
             g.drawImage(bgImage2, x, y, null);
         }
+
         // Apply offsets to sprites then draw them
         for (Sprite s : clouds) {
             s.setOffsets(xo, yo);
@@ -250,12 +239,24 @@ public class Game extends GameCore {
         // Apply offsets to player and draw
         player.setOffsets(xo, yo);
 
+        // Apply offsets to knife and draw
+        knife.setOffsets(xo, yo);
+
         // apply offsets to thug and draw
         thug.setOffsets(xo, yo);
         if (thug.isFlipped()) {
             thug.drawTransformedFlip(g);
         } else {
             thug.draw(g);
+        }
+
+        if((player.isMoveLeft() || player.isMoveRight()) && player.isOnGround())
+        {
+            knife.setPosition(player.getX()+5, player.getY()+5);
+            if(player.isFlipped())
+                knife.drawTransformedFlip(g);
+            else
+                knife.draw(g);
         }
 
         if(player.isFlipped()){
@@ -269,7 +270,6 @@ public class Game extends GameCore {
         {
             g.drawImage(youDiedImage, 0, 333, null);
         }
-
     }
 
     /**
@@ -307,8 +307,8 @@ public class Game extends GameCore {
                 thug.setVelocityX(0);
                 player.setVelocityX(0);
                 player.setAlive(false);
-                death.setLoop(false);
-                player.setAnimation(death);
+                playerDeath.setLoop(false);
+                player.setAnimation(playerDeath);
             }
         }
 
@@ -324,38 +324,41 @@ public class Game extends GameCore {
             if (player.isMoveRight()) {
                 if (player.isOnGround()) {
                     player.setVelocityX(moveSpeed);
-                    player.setAnimation(running);
+                    player.setAnimation(playerRunning);
                     player.setFlipped(false);
                 } else {
                     player.setVelocityX(moveSpeed);
-                    player.setAnimation(jumping);
+                    player.setAnimation(playerJumping);
                 }
             } else if (player.isMoveLeft()) {
                 player.setFlipped(true);
                 player.setVelocityX(-moveSpeed);
                 if (player.isOnGround()) {
-                    player.setAnimation(running);
+                    player.setAnimation(playerRunning);
                 } else {
-                    player.setAnimation(jumping);
+                    player.setAnimation(playerJumping);
                 }
             } else if(!player.isMoveLeft() && !player.isMoveRight() && player.isOnGround()){
                 player.setVelocityX(0);
-                player.setAnimation(standing);
+                player.setAnimation(playerIdle);
             }
 
             if (player.isAttack()) {
-                player.setAnimation(attacking);
+                player.setAnimation(playerAttacking);
             }
             if (player.isJump()) {
                 // if the player is standing on a tile, then jump
                 if (player.isOnGround()) {
                     player.setAnimationSpeed(1.8f);
-                    player.setVelocityY(fly);
-                    player.setAnimation(jumping);
+                    player.setVelocityY(jumpVelocity);
+                    player.setAnimation(playerJumping);
                     player.setOnGround(false);
                 }
             }
         }
+
+
+        knife.setVelocity(player.getVelocityX(), player.getVelocityY());
 
         // Update the animation and position of all the clouds
         for (Sprite s : clouds)
@@ -364,6 +367,7 @@ public class Game extends GameCore {
         // Now update the sprites animation and position
         player.update(elapsed);
         thug.update(elapsed);
+        knife.update(elapsed);
     }
 
     /**
@@ -447,7 +451,7 @@ public class Game extends GameCore {
                 } else {
                     player.setAttack(false);
                 }
-                player.setAnimation(attacking);
+                player.setAnimation(playerAttacking);
                 // ensure animation plays for its full length
                 try {
                     Thread.sleep(375);
