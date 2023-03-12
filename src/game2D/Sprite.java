@@ -8,7 +8,6 @@ import java.awt.image.BufferedImage;
  * This class provides the functionality for a moving animated image or Sprite.
  *
  * @author David Cairns
- *
  */
 public class Sprite {
 
@@ -16,6 +15,12 @@ public class Sprite {
     public static final int BOTTOM = 1;
     public static final int LEFT = 2;
     public static final int RIGHT = 3;
+
+    // The draw offset associated with this sprite. Used to draw it
+    // relative to specific on screen position (usually the player)
+    private int xoff = 0;
+    private int yoff = 0;
+
     // The current Animation to use for this sprite
     private Animation anim;
 
@@ -41,6 +46,154 @@ public class Sprite {
 
     // If render is 'true', the sprite will be drawn when requested
     private boolean render;
+    boolean weapon = false;
+
+    public boolean isWeapon() {
+        return weapon;
+    }
+
+    public void setWeapon(boolean weapon) {
+        this.weapon = weapon;
+    }
+
+    private boolean flipped, onGround, jump, moveRight, moveLeft, attack, hasWeapon = false;
+
+    private boolean alive = true;
+
+    int health = 4;
+
+    int damage = 1;
+
+    /**
+     * Creates a new Sprite object with the specified Animation.
+     *
+     * @param // animation to use for the sprite.
+     */
+    public Sprite(Animation anim) {
+        this.anim = anim;
+        render = true;
+        xscale = 1.0f;
+        yscale = 1.0f;
+        rotation = 0.0f;
+    }
+
+    /**
+     * Change the animation for the sprite to 'a'.
+     *
+     * @param a The animation to use for the sprite.
+     */
+    public void setAnimation(Animation a) {
+        anim = a;
+    }
+
+    /**
+     * Set the current animation to the given 'frame'
+     *
+     * @param frame The frame to set the animation to
+     */
+    public void setAnimationFrame(int frame) {
+        anim.setAnimationFrame(frame);
+    }
+
+    /**
+     * Pauses the animation at its current frame. Note that the
+     * sprite will continue to move, it just won't animate
+     */
+    public void pauseAnimation() {
+        anim.pause();
+    }
+
+    /**
+     * Pause the animation when it reaches frame 'f'.
+     *
+     * @param f The frame to stop the animation at
+     */
+    public void pauseAnimationAtFrame(int f) {
+        anim.pauseAt(f);
+    }
+
+    /**
+     * Change the speed at which the current animation runs. A
+     * speed of 1 will result in a normal animation,
+     * 0.5 will be half the normal rate and 2 will double it.
+     * <p>
+     * Note that if you change animation, it will run at whatever
+     * speed it was previously set to.
+     *
+     * @param speed The speed to set the current animation to.
+     */
+    public void setAnimationSpeed(float speed) {
+        anim.setAnimationSpeed(speed);
+    }
+
+    /**
+     * Starts an animation playing if it has been paused.
+     */
+    public void playAnimation() {
+        anim.play();
+    }
+
+    /**
+     * Returns a reference to the current animation
+     * assigned to this sprite.
+     *
+     * @return A reference to the current animation
+     */
+    public Animation getAnimation() {
+        return anim;
+    }
+
+    /**
+     * Updates this Sprite's Animation and its position based
+     * on the elapsedTime.
+     *
+     * @param // time that has elapsed since the last call to update
+     */
+    public void update(long elapsedTime) {
+        if (!render) return;
+        x += dx * elapsedTime;
+        y += dy * elapsedTime;
+        anim.update(elapsedTime);
+        width = getWidth();
+        height = getHeight();
+        if (width > height)
+            radius = width / 2.0f;
+        else
+            radius = height / 2.0f;
+    }
+
+    public int getHealth() {
+        return health;
+    }
+
+    public void setHealth(int health) {
+        this.health = health;
+    }
+
+    public int getDamage() {
+        return damage;
+    }
+
+    public void setDamage(int damage) {
+        this.damage = damage;
+    }
+
+
+    public boolean isHasWeapon() {
+        return hasWeapon;
+    }
+
+    public void setHasWeapon(boolean hasWeapon) {
+        this.hasWeapon = hasWeapon;
+    }
+
+    public boolean isAlive() {
+        return alive;
+    }
+
+    public void setAlive(boolean alive) {
+        this.alive = alive;
+    }
 
     public boolean isJump() {
         return jump;
@@ -74,404 +227,277 @@ public class Sprite {
         this.attack = attack;
     }
 
-    boolean onGround = false;
-    boolean jump = false;
-    boolean moveRight = false;
-    boolean moveLeft = false;
-    boolean attack = false;
-
-    boolean alive = true;
-
-    public boolean isAlive() {
-        return alive;
-    }
-
-    public void setAlive(boolean alive) {
-        this.alive = alive;
-    }
-
-    // Whether or not the sprite is flipped horizontally
-    private boolean flipped;
-
-    // The draw offset associated with this sprite. Used to draw it
-    // relative to specific on screen position (usually the player)
-    private int xoff=0;
-    private int yoff=0;
-
     /**
-     *  Creates a new Sprite object with the specified Animation.
-     *
-     * @param // animation to use for the sprite.
-     *
+     * Gets this Sprite's current x position.
      */
-    public Sprite(Animation anim)
-    {
-        this.anim = anim;
-        render = true;
-        xscale = 1.0f;
-        yscale = 1.0f;
-        rotation = 0.0f;
-    }
-
-    /**
-     * Change the animation for the sprite to 'a'.
-     *
-     * @param a The animation to use for the sprite.
-     */
-    public void setAnimation(Animation a)
-    {
-        anim = a;
-    }
-
-    /**
-     * Set the current animation to the given 'frame'
-     *
-     * @param frame The frame to set the animation to
-     */
-    public void setAnimationFrame(int frame)
-    {
-        anim.setAnimationFrame(frame);
-    }
-
-    /**
-     * Pauses the animation at its current frame. Note that the
-     * sprite will continue to move, it just won't animate
-     */
-    public void pauseAnimation()
-    {
-        anim.pause();
-    }
-
-    /**
-     * Pause the animation when it reaches frame 'f'.
-     *
-     * @param f The frame to stop the animation at
-     */
-    public void pauseAnimationAtFrame(int f)
-    {
-        anim.pauseAt(f);
-    }
-
-    /**
-     * Change the speed at which the current animation runs. A
-     * speed of 1 will result in a normal animation,
-     * 0.5 will be half the normal rate and 2 will double it.
-     *
-     * Note that if you change animation, it will run at whatever
-     * speed it was previously set to.
-     *
-     * @param speed	The speed to set the current animation to.
-     */
-    public void setAnimationSpeed(float speed)
-    {
-        anim.setAnimationSpeed(speed);
-    }
-
-    /**
-     * Starts an animation playing if it has been paused.
-     */
-    public void playAnimation()
-    {
-        anim.play();
-    }
-
-    /**
-     * Returns a reference to the current animation
-     * assigned to this sprite.
-     *
-     * @return A reference to the current animation
-     */
-    public Animation getAnimation()
-    {
-        return anim;
-    }
-
-    /**
-     Updates this Sprite's Animation and its position based
-     on the elapsedTime.
-
-     @param // time that has elapsed since the last call to update
-     */
-    public void update(long elapsedTime)
-    {
-        if (!render) return;
-        x += dx * elapsedTime;
-        y += dy * elapsedTime;
-        anim.update(elapsedTime);
-        width = getWidth();
-        height = getHeight();
-        if (width > height)
-            radius = width / 2.0f;
-        else
-            radius = height / 2.0f;
-    }
-
-    /**
-     Gets this Sprite's current x position.
-     */
-    public float getX()
-    {
+    public float getX() {
         return x;
     }
 
     /**
-     Gets this Sprite's current y position.
+     * Gets this Sprite's current y position.
      */
-    public float getY()
-    {
+    public float getY() {
         return y;
     }
 
     /**
-     Sets this Sprite's current x position.
+     * Sets this Sprite's current x position.
      */
-    public void setX(float x)
-    {
+    public void setX(float x) {
         this.x = x;
     }
 
     /**
-     Sets this Sprite's current y position.
+     * Sets this Sprite's current y position.
      */
-    public void setY(float y)
-    {
+    public void setY(float y) {
         this.y = y;
     }
 
     /**
-     Sets this Sprite's new x and y position.
+     * Sets this Sprite's new x and y position.
      */
-    public void setPosition(float x, float y)
-    {
+    public void setPosition(float x, float y) {
         setX(x);
         setY(y);
     }
 
-    public void setFlipped(boolean f)
-    {
+    public void setFlipped(boolean f) {
         flipped = f;
     }
 
-    public boolean isFlipped()
-    {
+    public boolean isFlipped() {
         return flipped;
     }
 
-    public void shiftX(float shift)
-    {
+    public void shiftX(float shift) {
         this.x += shift;
     }
 
-    public void shiftY(float shift)
-    {
+    public void shiftY(float shift) {
         this.y += shift;
     }
 
     /**
-     Gets this Sprite's width, based on the size of the
-     current image.
+     * Gets this Sprite's width, based on the size of the
+     * current image.
      */
-    public int getWidth()
-    {
-        return (int)(anim.getImage().getWidth(null)*Math.abs(xscale));
+    public int getWidth() {
+        return (int) (anim.getImage().getWidth(null) * Math.abs(xscale));
     }
 
     /**
-     Gets this Sprite's height, based on the size of the
-     current image.
+     * Gets this Sprite's height, based on the size of the
+     * current image.
      */
-    public int getHeight()
-    {
-        return (int)(anim.getImage().getHeight(null)*Math.abs(yscale));
+    public int getHeight() {
+        return (int) (anim.getImage().getHeight(null) * Math.abs(yscale));
     }
 
     /**
-     Gets the sprites radius in pixels
+     * Gets the sprites radius in pixels
      */
-    public float getRadius()
-    {
+    public float getRadius() {
         return radius;
     }
 
     /**
-     Gets the horizontal velocity of this Sprite in pixels
-     per millisecond.
+     * Gets the horizontal velocity of this Sprite in pixels
+     * per millisecond.
      */
-    public float getVelocityX()
-    {
+    public float getVelocityX() {
         return dx;
     }
 
     /**
-     Gets the vertical velocity of this Sprite in pixels
-     per millisecond.
+     * Gets the vertical velocity of this Sprite in pixels
+     * per millisecond.
      */
-    public float getVelocityY()
-    {
+    public float getVelocityY() {
         return dy;
     }
 
 
     /**
-     Sets the horizontal velocity of this Sprite in pixels
-     per millisecond.
+     * Sets the horizontal velocity of this Sprite in pixels
+     * per millisecond.
      */
-    public void setVelocityX(float dx)
-    {
+    public void setVelocityX(float dx) {
         this.dx = dx;
     }
 
     /**
-     Sets the vertical velocity of this Sprite in pixels
-     per millisecond.
+     * Sets the vertical velocity of this Sprite in pixels
+     * per millisecond.
      */
-    public void setVelocityY(float dy)
-    {
+    public void setVelocityY(float dy) {
         this.dy = dy;
     }
 
     /**
-     Sets the horizontal and vertical velocity of this Sprite in pixels
-     per millisecond.
+     * Sets the horizontal and vertical velocity of this Sprite in pixels
+     * per millisecond.
      */
-    public void setVelocity(float dx, float dy)
-    {
+    public void setVelocity(float dx, float dy) {
         this.dx = dx;
         this.dy = dy;
     }
 
     /**
-     Set the x and y scale of the sprite to 'scx' and 'scy' respectively.
-     If scx and scy are 1, the sprite will be drawn at normal size. If they
-     are 0.5 it will be drawn at half size. If scx is -1, the sprite will be
-     flipped along its vertical axis (it will face left instead of right).
-     Negative values of scy will flip along the horizontal axis. The flipping
-     and scaling of the sprite are now accounted for when setting a sprite
-     position and getting its width and height (you will always reference
-     the top left of the sprite irrespective of the scaling).
-     Note that scaling and rotation are only applied when
-     using the drawTransformed method.
+     * Set the x and y scale of the sprite to 'scx' and 'scy' respectively.
+     * If scx and scy are 1, the sprite will be drawn at normal size. If they
+     * are 0.5 it will be drawn at half size. If scx is -1, the sprite will be
+     * flipped along its vertical axis (it will face left instead of right).
+     * Negative values of scy will flip along the horizontal axis. The flipping
+     * and scaling of the sprite are now accounted for when setting a sprite
+     * position and getting its width and height (you will always reference
+     * the top left of the sprite irrespective of the scaling).
+     * Note that scaling and rotation are only applied when
+     * using the drawTransformed method.
      */
-    public void setScale(float scx, float scy)
-    {
+    public void setScale(float scx, float scy) {
         xscale = scx;
         yscale = scy;
     }
 
     /**
-     Set the scale of the sprite to 's'. If s is 1
-     the sprite will be drawn at normal size. If 's'
-     is 0.5 it will be drawn at half size. Note that
-     scaling and rotation are only applied when
-     using the drawTransformed method.
+     * Set the scale of the sprite to 's'. If s is 1
+     * the sprite will be drawn at normal size. If 's'
+     * is 0.5 it will be drawn at half size. Note that
+     * scaling and rotation are only applied when
+     * using the drawTransformed method.
      */
-    public void setScale(float s)
-    {
+    public void setScale(float s) {
         xscale = s;
         yscale = s;
     }
 
 
     /**
-     Get the current value of the x scaling attribute.
-     See 'setScale' for more information.
+     * Get the current value of the x scaling attribute.
+     * See 'setScale' for more information.
      */
-    public double getScaleX()
-    {
+    public double getScaleX() {
         return xscale;
     }
 
     /**
-     Get the current value of the y scaling attribute.
-     See 'setScale' for more information.
+     * Get the current value of the y scaling attribute.
+     * See 'setScale' for more information.
      */
-    public double getScaleY()
-    {
+    public double getScaleY() {
         return yscale;
     }
 
     /**
-     Set the rotation angle for the sprite in degrees.
-     Note that scaling and rotation are only applied when
-     using the drawTransformed method.
+     * Set the rotation angle for the sprite in degrees.
+     * Note that scaling and rotation are only applied when
+     * using the drawTransformed method.
      */
-    public void setRotation(double r)
-    {
+    public void setRotation(double r) {
         rotation = Math.toRadians(r);
     }
 
     /**
-     Get the current value of the rotation attribute.
-     in degrees. See 'setRotation' for more information.
+     * Get the current value of the rotation attribute.
+     * in degrees. See 'setRotation' for more information.
      */
-    public double getRotation()
-    {
+    public double getRotation() {
         return Math.toDegrees(rotation);
     }
 
     /**
-     Stops the sprites movement at the current position
+     * Stops the sprites movement at the current position
      */
-    public void stop()
-    {
+    public void stop() {
         dx = 0;
         dy = 0;
     }
 
     /**
-     Gets this Sprite's current image.
+     * Gets this Sprite's current image.
      */
-    public Image getImage()
-    {
+    public Image getImage() {
         return anim.getImage();
     }
 
     /**
-     Draws the sprite with the graphics object 'g' at
-     the current x and y co-ordinates. Scaling and rotation
-     transforms are NOT applied.
+     * Draws the sprite with the graphics object 'g' at
+     * the current x and y co-ordinates. Scaling and rotation
+     * transforms are NOT applied.
      */
-    public void draw(Graphics2D g)
-    {
+    public void draw(Graphics2D g) {
         if (!render) return;
 
-        g.drawImage(getImage(),(int)x+xoff,(int)y+yoff,null);
+        g.drawImage(getImage(), (int) x + xoff, (int) y + yoff, null);
     }
 
     /**
-     Draws the bounding box of this sprite using the graphics object 'g' and
-     the currently selected foreground colour.
+     * Draws the bounding box of this sprite using the graphics object 'g' and
+     * the currently selected foreground colour.
      */
-    public void drawBoundingBox(Graphics2D g)
-    {
+    public void drawBoundingBox(Graphics2D g) {
+        if (!render) return;
+        Image img = getImage();
+        g.drawRect((int) x + xoff, (int) y + yoff, (img.getWidth(null) / 2), img.getHeight(null));
+    }
+
+    public void drawBounds(Graphics2D g) {
+        if (!render) return;
+        Image img = getImage();
+
+        int xCoord, yCoord;
+        if (flipped) {
+            xCoord = (int) (x + xoff - img.getWidth(null) * xscale + (img.getWidth(null) / 2));
+        } else {
+            xCoord = (int) (x + xoff + 10);
+        }
+        yCoord = (int) (y + yoff);
+
+        g.drawRect(xCoord, yCoord, (int) (img.getWidth(null) * xscale), (int) (img.getHeight(null) * yscale));
+    }
+
+    public Rectangle getKnifeBounds() {
+        Image img = getImage();
+        int xCoord, yCoord;
+        if (flipped) {
+            xCoord = (int) (x + xoff - img.getWidth(null) * xscale + (img.getWidth(null) / 2));
+        } else {
+            xCoord = (int) (x + xoff + 10);
+        }
+        yCoord = (int) (y + yoff);
+        return new Rectangle(xCoord, yCoord, (int) (img.getWidth(null) * xscale), (int) (img.getHeight(null) * yscale));
+    }
+
+
+    /**
+     * Draws the bounding circle of this sprite using the graphics object 'g' and
+     * the currently selected foreground colour.
+     */
+    public void drawBoundingCircle(Graphics2D g) {
         if (!render) return;
 
         Image img = getImage();
-        g.drawRect((int)x+xoff,(int)y+yoff,((img.getWidth(null)/2)+13),img.getHeight(null));
+
+        g.drawArc((int) x + xoff - (img.getWidth(null) / 4), (int) y + yoff, img.getWidth(null), img.getHeight(null), 0, 360);
+    }
+
+    public Circle getBoundingCircle() {
+        int radius = getImage().getWidth(null) / 4;
+        int x = (int) (this.x + xoff - radius);
+        int y = (int) (this.y + yoff - radius);
+        return new Circle(x, y, radius);
     }
 
     /**
-     Draws the bounding circle of this sprite using the graphics object 'g' and
-     the currently selected foreground colour.
+     * Draws the sprite with the graphics object 'g' at
+     * the current x and y co-ordinates with the current scaling
+     * and rotation transforms applied.
+     *
+     * @param g The graphics object to draw to,
      */
-    public void drawBoundingCircle(Graphics2D g)
-    {
-        if (!render) return;
-
-        Image img = getImage();
-
-        g.drawArc((int)x+xoff,(int)y+yoff,img.getWidth(null),img.getHeight(null),0, 360);
-    }
-
-    /**
-     Draws the sprite with the graphics object 'g' at
-     the current x and y co-ordinates with the current scaling
-     and rotation transforms applied.
-
-     @param g The graphics object to draw to,
-     */
-    public void drawTransformed(Graphics2D g)
-    {
+    public void drawTransformed(Graphics2D g) {
         if (!render) return;
 
         AffineTransform transform = new AffineTransform();
@@ -483,15 +509,14 @@ public class Sprite {
         if (xscale < 0) shiftx = getWidth();
         if (yscale < 0) shifty = getHeight();
 
-        transform.translate(Math.round(x)+shiftx+xoff,Math.round(y)+shifty+yoff);
-        transform.scale(xscale,yscale);
-        transform.rotate(rotation,getImage().getWidth(null)/2,getImage().getHeight(null)/2);
+        transform.translate(Math.round(x) + shiftx + xoff, Math.round(y) + shifty + yoff);
+        transform.scale(xscale, yscale);
+        transform.rotate(rotation, getImage().getWidth(null) / 2, getImage().getHeight(null) / 2);
         // Apply transform to the image and draw it
-        g.drawImage(getImage(),transform,null);
+        g.drawImage(getImage(), transform, null);
     }
 
-    public void drawTransformedFlip(Graphics2D g)
-    {
+    public void drawTransformedFlip(Graphics2D g) {
         if (!render) return;
 
         AffineTransform transform = new AffineTransform();
@@ -503,69 +528,41 @@ public class Sprite {
         if (xscale < 0) shiftx = getWidth();
         if (yscale < 0) shifty = getHeight();
 
-        transform.translate(Math.round(x)+shiftx+xoff+((getWidth()/2)+10),Math.round(y)+shifty+yoff);
-        transform.scale(xscale,yscale);
-        transform.rotate(rotation,getImage().getWidth(null)/2,getImage().getHeight(null)/2);
+        transform.translate(Math.round(x) + shiftx + xoff + (getWidth() / 2), Math.round(y) + shifty + yoff);
+        transform.scale(xscale, yscale);
+        transform.rotate(rotation, getImage().getWidth(null) / 2, getImage().getHeight(null) / 2);
         transform.scale(-1, 1); // flip horizontally
         // Apply transform to the image and draw it
-        g.drawImage(getImage(),transform,null);
+        g.drawImage(getImage(), transform, null);
     }
 
-
-    public void drawFlipped(Graphics2D g, int x, int y)
-    {
-        if (!render) {
-            return;
-        }
-
-        BufferedImage image = (BufferedImage) anim.getImage(); // Get the player object's image
-
-        // Create a new BufferedImage for the flipped image
-        BufferedImage flippedImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
-
-        // Flip the original image by drawing it onto the flipped image in reverse order
-        Graphics2D flippedGraphics = flippedImage.createGraphics();
-        flippedGraphics.drawImage(image, image.getWidth(), 0, -image.getWidth(), image.getHeight(), null);
-        flippedGraphics.dispose();
-
-        // Draw the flipped image if necessary, or the original image if not
-       // if (flipped) {
-            g.drawImage(flippedImage, x + image.getWidth(), y, null);
-      //  } else {
-       //     g.drawImage(image, x, y, null);
-       // }
+    /**
+     * Hide the sprite.
+     */
+    public void hide() {
+        render = false;
     }
 
+    /**
+     * Show the sprite
+     */
+    public void show() {
+        render = true;
+    }
 
     /**
-     Hide the sprite.
+     * Set an x & y offset to use when drawing the sprite.
+     * Note this does not affect its actual position, just
+     * moves the drawn position.
      */
-    public void hide()  {	render = false;  }
-
-    /**
-     Show the sprite
-     */
-    public void show()  {  	render = true;   }
-
-    /**
-     Check the visibility status of the sprite.
-     */
-    public boolean isVisible() { return render; }
-
-    /**
-     Set an x & y offset to use when drawing the sprite.
-     Note this does not affect its actual position, just
-     moves the drawn position.
-     */
-    public void setOffsets(int x, int y)
-    {
+    public void setOffsets(int x, int y) {
         xoff = x;
         yoff = y;
     }
 
 
     public Rectangle getBounds() {
-        return new Rectangle((int)x+xoff,(int)y+yoff,getWidth(),getHeight());
+        return new Rectangle((int) x + xoff, (int) y + yoff, getWidth(), getHeight());
     }
 
     public boolean isOnGround() {
@@ -577,7 +574,7 @@ public class Sprite {
     }
 
     public Rectangle getBoundingBox() {
-        return new Rectangle((int)x+xoff,(int)y+yoff,((getWidth()/2)+13),getHeight());
+        return new Rectangle((int) x + xoff, (int) y + yoff, ((getWidth() / 2)), getHeight());
     }
 
     public boolean collidesWith(Sprite s2) {

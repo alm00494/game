@@ -1,4 +1,4 @@
-75 12 58 58
+75 13 58 58
 // The first line should contain the width and height of the
 // map and the width and height of each tile. A list of character to
 // tile mappings is then provided where each character is preceded by a
@@ -15,20 +15,21 @@
 #y=Tile_08.png
 #z=Tile_09.png
 #a=Tile_10.png
+#t=Tile_02r.png
 // The actual tile map is preceded by the #map line
 #map
 vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 u...................................g.......................g.............w
 u...................................g.......................g.............w
 u...................................g.......................ggggggggggggg.w
-u...................................g.......................g.............w
-u...yyyyzzzzaaaa....................g.......................g.ggggggggggggw
-u...vvvvwwwwxxxx....................g.............ggggggggg.g.............w
-u...ssssttttuuuu............gggg....g............gg.......g.ggggggggggggg.w
+u..................ggg..............g.......................g.............w
+ut..ssssssssssss......ggg...........g.......................g.ggggggggggggw
+u........................ggg........g.............ggggggggg.g.............w
+u...........................gggg....g............gg.......g.ggggggggggggg.w
 u.....................gggg........ggg...........ggggggggggg.g.............w
-u...........ggg...gg......................gg.gggg.........g.g..gggggggggggw
+u...........ggg...gg.....gggggggggg.......gg.gggg.........g.g..gggggggggggw
 u..........ggggg..gg..................ggg.................g...gg..........w
-sssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss
-
+usssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssw
+uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu
 
 

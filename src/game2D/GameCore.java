@@ -21,7 +21,7 @@ public abstract class GameCore extends JFrame implements KeyListener {
     private boolean stop;			// true if the game loop should continue
     private	long startTime;				// The time the game started
     private long currTime;				// The current time
-    private long elapsedTime;			// Elapsed time since previous check
+    private long elapsedTime, lastTime;			// Elapsed time since previous check
 
     private long frames;				// Used to calculate frames per second (FPS)
 
@@ -81,6 +81,11 @@ public abstract class GameCore extends JFrame implements KeyListener {
      */
     private void init(boolean full, int xres, int yres) {
 
+        // Set the window title
+        setTitle("GameCore");
+
+        // Set the window size
+        setSize(xres, yres);
 
         setVisible(true);
 
@@ -150,8 +155,10 @@ public abstract class GameCore extends JFrame implements KeyListener {
      */
     public float getFPS()
     {
-        if (currTime - startTime <= 0) return 0.0f;
-        return (float)frames/((currTime - startTime)/1000.0f);
+        lastTime = System.currentTimeMillis();
+        //if (currTime - startTime <= 0) return 0.0f;
+        //return (float)frames/((currTime - startTime)/1000.0f);
+        return (float)frames/(elapsedTime/1000.0f);
     }
 
     /**
