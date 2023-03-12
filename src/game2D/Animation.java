@@ -16,6 +16,15 @@ import java.util.ArrayList;
 public class Animation {
 
     private ArrayList<AnimFrame> frames;	// The set of animation frames
+
+    public int getCurrFrameIndex() {
+        return currFrameIndex;
+    }
+
+    public void setCurrFrameIndex(int currFrameIndex) {
+        this.currFrameIndex = currFrameIndex;
+    }
+
     private int currFrameIndex;				// Current frame animation is on
     private long animTime;					// Current animation time
     private long totalDuration;				// Total animation time

@@ -2,11 +2,13 @@ package game2D;
 
 import javax.sound.sampled.*;
 import java.io.File;
+import javax.sound.midi.*;
 
 public class Sound extends Thread {
 
     String filename;	// The name of the file to play
     boolean finished;	// A flag showing that the thread has finished
+
 
     public Sound(String fname) {
         filename = fname;
@@ -37,4 +39,6 @@ public class Sound extends Thread {
         finished = true;
 
     }
+
+
 }
