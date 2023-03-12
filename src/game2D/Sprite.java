@@ -41,6 +41,26 @@ public class Sprite {
     private double xscale;
     private double yscale;
 
+    public long getLastAttack() {
+        return lastAttack;
+    }
+
+    public boolean wasAttacked = false;
+
+    public boolean isWasAttacked() {
+        return wasAttacked;
+    }
+
+    public void setWasAttacked(boolean wasAttacked) {
+        this.wasAttacked = wasAttacked;
+    }
+
+    public void setLastAttack(long lastAttack) {
+        this.lastAttack = lastAttack;
+    }
+
+    private long lastAttack = -1;
+
     // The rotation to apply to the sprite image
     private double rotation;
 
@@ -94,6 +114,8 @@ public class Sprite {
     public void setAnimationFrame(int frame) {
         anim.setAnimationFrame(frame);
     }
+
+
 
     /**
      * Pauses the animation at its current frame. Note that the

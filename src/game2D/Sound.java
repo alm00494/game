@@ -2,7 +2,6 @@ package game2D;
 
 import javax.sound.sampled.*;
 import java.io.File;
-import javax.sound.midi.*;
 
 public class Sound extends Thread {
 
