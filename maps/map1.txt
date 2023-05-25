@@ -1,0 +1,74 @@
+92 16 58 58
+// The first line should contain the width and height of the
+// map and the width and height of each tile. A list of character to
+// tile mappings is then provided where each character is preceded by a
+// # character. The dot character always defaults to a blank space 
+// Note that the referenced files should be in the same directory as the
+// tile map.
+#a=StoneUp.png
+#b=ledge.png
+#c=ledge_l.png
+#d=Ledge_m.png
+#e=Ledge_r.png
+#f=GrassMidRight.png
+#g=GrassLeftCorner.png
+#h=IndustrialTileCentre.png
+#i=IndustrialTileLeftCentralWall.png
+#j=IndustrialTileTopCentral.png
+#k=IndustrialTile_06.png
+#l=IndustrialTileLeftBottom.png
+#m=IndustrialTileCentreBottom.png
+#n=IndustrialTile_24.png
+#o=IndustrialTileTopLeftWall.png
+#p=GrassEndLeft.png
+#q=RockTop.png
+#r=UpperRock.png
+#s=GrassMid.png
+#t=GrassRightCorner.png
+#u=RockEdgeRight.png
+#v=BrickCorner.png
+#w=DarkStone.png
+#x=sign.png
+#y=GrassPiece.png
+#z=StoneCorner.png
+#A=RockEdgeDown.png
+#B=Rock.png
+#C=Ledge_m.png
+#D=RockTop.png
+#E=GrassToRock.png
+#F=IndustrialTileTopRightWall.png
+#G=Ledge_m.png
+#H=GrassMid.png
+#I=GrassMid.png
+#J=Pipe.png
+#L=Ledge_m.png
+#M=IndustrialTileTopLeftWall.png
+#N=IndustrialTileTopRightWall.png
+#O=IndustrialTileRightBottom.png
+#P=IndustrialTileBackground.png
+#Q=IndustrialTileBackground.png
+#S=Ledge_m.png
+#T=GrassMid.png
+#U=IndustrialTileRightCentralWall.png
+#V=IndustrialTileBackground.png
+#W=GrassEndLeft.png
+#X=IndustrialTileTopCentral.png
+#)=trigger_01.png
+// The actual tile map is preceded by the #map line
+#map
+jjjjjjjN.................................................................ihhhhhhhhhhhhhhhhhh
+VVVVVVVU.................................................................ihhhhhhhhhhhhhhhhhh
+VVVVVVVU.................................................................ihhhhhhhhhhhhhhhhhh
+VVVVVVVU....x.........K.............b....................................ihhhhhhhhhhhhhhhhhh
+VVVVVVVUS)ddddd)e..cddddddGdCdde......ce.................................ihhhhhhhhhhhhhhhhhh
+VVVVVVVU................................cde..............................ihhhhhhhhhhhhhhhhhh
+VVVVVVVU.....................................ce..........................ihhhhhhhhhhhhhhhhhh
+VVVVVVVU.......c)))))e..............SdLdddddde...........................ihhhhhhhhhhhhhhhhhh
+VVVVVVVU.................JJ.....JJ.....................cde..cde...MN.....lmmmmmmmmmmmmmmmmmm
+mmmmmmmO................MjjN...MjjN............MjXXjN.............lOJ.....PPPPQQQQQQQQQQQQQQ
+qqqqqqqqWsTsssssssssssssssss...sssssssssssIsssssssssssssssssssssHssssssssojjjjjjjjjjjjjjjjjj
+BBBBBBBBBqqqqqqqqqqqqqqqqqqqDqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqihhhhhhhhhhhhhhhhhh
+BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB
+BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB
+BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB
+BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB

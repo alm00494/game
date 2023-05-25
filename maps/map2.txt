@@ -1,0 +1,94 @@
+73 25 58 58
+// The first line should contain the width and height of the
+// map and the width and height of each tile. A list of character to
+// tile mappings is then provided where each character is preceded by a
+// # character. The dot character always defaults to a blank space 
+// Note that the referenced files should be in the same directory as the
+// tile map.
+#!=IndustrialTileTopCentral.png
+#?=IndustrialTileTopCentral.png
+#£=IndustrialTileTopCentral.png
+#,=IndustrialTileBackground3.png
+#0=IndustrialTileTopCentral.png
+#1=IndustrialTileTopCentral.png
+#2=IndustrialTileTopCentral.png
+#3=IndustrialTileTopCentral.png
+#4=IndustrialTileTopCentral.png
+#5=IndustrialTileTopCentral.png
+#6=IndustrialTileBackground3.png
+#7=IndustrialTileBackground3.png
+#8=IndustrialTileBackground3.png
+#a=IndustrialTileBottomLeftCorner.png
+#b=IndustrialTileTopLeftCorner.png
+#c=IndustrialTileRightBottom.png
+#d=IndustrialTileTopRightWall.png
+#e=IndustrialTileRightCorner.png
+#f=IndustrialTileTopLeftWall.png
+#h=IndustrialTileCentre.png
+#i=IndustrialTileLeftCentralWall.png
+//do comments break this?
+#j=IndustrialTileTopCentral.png
+//do they??
+#k=IndustrialTile_06.png
+#l=IndustrialTileLeftBottom.png
+#m=IndustrialTileCentreBottom.png
+#n=IndustrialTile_24.png
+#o=IndustrialTileTopLeftWall.png
+#p=bars.png
+#q=IndustrialTileUpperRightCorner.png
+#r=Pipe.png
+#v=IndustrialTileCentreBottom.png
+#x=sign.png
+#D=DoorOpen.png
+#E=IndustrialTileCentreBottom.png
+#F=DoorLocked.png
+#P=IndustrialTileBackground.png
+#Q=IndustrialTileBackground.png
+#R=IndustrialTileTopCentral.png
+#S=IndustrialTileTopCentral.png
+#T=IndustrialTileTopCentral.png
+#U=IndustrialTileRight.png
+#W=IndustrialTileBackground2.png
+#+=IndustrialTileTopCentral.png
+// The actual tile map is preceded by the #map line
+#map
+jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjd
+hhhhhhhhhbvvvvvvvvvvvqhhhhbvvvvvvvvvvvvvvvvvvvvvvvvvqbvvvvvvvvvqhhhhhhhhU
+hhhhhhhhhU,,,,,,,,,,,ihhhhU,,,,,,,,,,,,,,,,,,,,,,,,,iU,,,,,,,,,ihhhhhhhhU
+hhhhhhhhhU,,,ppppp,,,ihhhhU,,,,,,,,,,,,,,,ppppppp,,,lc,,,ppp,,,ihhhhhhhhU
+hhhhhhhhhU,,,,,,,,,,,lvvvvc,,,,,,,vvvvvv,,,,,,,,,,,,,,,,,,,,,,,ihhhhhhhhU
+hhhhhhhhhU,,,,F,,r,,,,,,,,,,,,,,r,,,,,,,,r,,,,,,,,,,,,,,,,D,,,,ihhhhhhhhU
+hhhhhhhhhajjjj?jjjjjjjjTjjjjjjjjjjj345jjjjjjjjjjjjjRjjjjjjjjj£jehhhhhhhhU
+hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhbvvvqhhhhhhhhhhhhhhhhhhhhhhhhU
+hhhhhhhbvvvvvvvvvvvvvvvvqhhhhhhhhhhhhhhhhhhU6,,lvvvvvvvvvqhhhhhhhhhhhhhhU
+hhhhhhhU,,,,,,,,,,,,,8,,ihhhhhhhhhhhhhhhhhhU,,,,,,,,,,,,,ihhhhhhhhhhhhhhU
+hhhhhhhU,,,ppppppppp,,,,ihhhbvvvqhhhhhhhhhhU,,,,,,,,,,,,,ihhhhhhhhhhhhhhU
+hhhhhhhU,,,,,,,,,,,,,,,,ihhhU7,,ihhhhhhhhhhU,,,,,,,,,,,,,ihhhhhhhhhhhhhhU
+hhhhhhhaj+jjjjjjjjjjd,,,lvvvc,,,lvvvvvvvvvvc,,,fjjjjjjd,,ihhhhhhhhhhhhhhU
+hhhhhhhhhhhhhhhhhhhhU,,,,,,,,,,,,,,,,,,,,,,,,,,ihhhhhhU,,ihhhhhhhhhhhhhhU
+hhhhhhhhhhhhhhhhhhhhU,,,,,,,,,,,,,,,,,,,,,,,,,,ihhhhhhU,,lvvvvvvvvvvqhhhU
+hhhhhhhbvvvvvvvvvvvvc,,,fjjjjj1jjjjjjjjjjjjjj2jehhhhhhU,,,,,,,,,,,,,ihhhU
+hhhhhhhU,,,,,,,,,,,,,,,,ihhhhhhhhhhhhhhhhhhhhhhhhhhhhhU,,,,,,,,D,,,,ihhhU
+hhhhhhhU,,,,pppppp,,,,,,ihhhhhhhhhhhhhhhhhhhhhhhhhhhhhajjjjjjjjjj!jjehhhU
+hhhhhhhU,F,,,,,,,,,,,,,,ihhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhU
+hhhhhhhajSjjjjjjjjjjjj0jehhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhU
+hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhU
+hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhU
+hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhU
+hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhU
+hhhhhhhhhhhhhhhhhhhhhhhhhvQPKIHGCFPQvooWvhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhU
+hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhU
+// Special Characters:
+// . = blank space
+// C = chest spawn point
+// F = fountain spawn point
+// G = guard spawn point 1
+// H = guard spawn point 2
+// I = guard spawn point 3
+// K = keycard spawn point
+// P = Industrial background
+// Q = End of level
+// S = player spawn point
+// T = thugs spawn point 1
+// ) = message trigger
+

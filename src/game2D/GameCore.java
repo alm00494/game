@@ -9,7 +9,7 @@ import java.awt.image.BufferedImage;
 
 /**
  * @author David Cairns
- *
+ * <p>
  * Core Game class that implements default game loop. Subclasses should
  * implement the draw() method and override the update method.
  */
@@ -18,23 +18,26 @@ public abstract class GameCore extends JFrame implements KeyListener {
     private static final long serialVersionUID = 1L;
     protected static final int FONT_SIZE = 12;
 
-    private boolean stop;			// true if the game loop should continue
-    private	long startTime;				// The time the game started
-    private long currTime;				// The current time
-    private long elapsedTime, lastTime;			// Elapsed time since previous check
+    private boolean stop;            // true if the game loop should continue
+    private long startTime;                // The time the game started
+    private long currTime;                // The current time
 
-    private long frames;				// Used to calculate frames per second (FPS)
+    private long elapsedTime, lastTime;            // Elapsed time since previous check
 
-    private BufferedImage buffer=null;	// buffer is used as a buffered image for drawing offscreen
-    private Graphics2D 	  bg=null;    		// The virtual Graphics2D device associated with the above image
+    public long getNumFrames() {
+        return frames;
+    }
+
+    private long frames;                // Used to calculate frames per second (FPS)
+
+    private BufferedImage buffer = null;    // buffer is used as a buffered image for drawing offscreen
+    private Graphics2D bg = null;            // The virtual Graphics2D device associated with the above image
 
 
     /**
      * Default constructor for GameCore
-     *
      */
-    public GameCore()
-    {
+    public GameCore() {
         stop = false;
 
         frames = 1;
@@ -43,12 +46,12 @@ public abstract class GameCore extends JFrame implements KeyListener {
     }
 
 
-
     /**
      * Signals the game loop that it's time to quit
-     *
      */
-    public void stop() { stop = true; }
+    public void stop() {
+        stop = true;
+    }
 
 
     /**
@@ -56,17 +59,14 @@ public abstract class GameCore extends JFrame implements KeyListener {
      * and then calling the gameLoop()
      *
      * @param full True to set to fullscreen mode, false otherwise
-     * @param x Width of screen in pixels
-     * @param y Height of screen in pixels
+     * @param x    Width of screen in pixels
+     * @param y    Height of screen in pixels
      */
     public void run(boolean full, int x, int y) {
-        try
-        {
-            init(full,x,y);
+        try {
+            init(full, x, y);
             gameLoop();
-        }
-        finally
-        {
+        } finally {
 
         }
     }
@@ -75,9 +75,9 @@ public abstract class GameCore extends JFrame implements KeyListener {
     /**
      * Internal initialisation method.
      *
-     * @param full	True to start the game in full screen mode
-     * @param xres	Width in pixels of game screen
-     * @param yres	Height in pixels of game screen
+     * @param full True to start the game in full screen mode
+     * @param xres Width in pixels of game screen
+     * @param yres Height in pixels of game screen
      */
     private void init(boolean full, int xres, int yres) {
 
@@ -100,29 +100,32 @@ public abstract class GameCore extends JFrame implements KeyListener {
      * @param fileName The file path to the image file that should be loaded
      * @return A reference to the Image object that was loaded
      */
-    public Image loadImage(String fileName)
-    {
+    public Image loadImage(String fileName) {
         return new ImageIcon(fileName).getImage();
     }
 
+    public long getCurrTime() {
+        return currTime;
+    }
+
     /**
-     *  Runs through the game loop until stop() is called.
-     *
-     *  This method will call your update() method followed by your draw()
-     *  method to display the updated game state. It implements double buffering
-     *  for both full screen and windowed mode.
+     * Runs through the game loop until stop() is called.
+     * <p>
+     * This method will call your update() method followed by your draw()
+     * method to display the updated game state. It implements double buffering
+     * for both full screen and windowed mode.
      */
     public void gameLoop() {
         startTime = System.currentTimeMillis();
         currTime = startTime;
-        frames = 1;		// Keep a note of frames for performance measure
+        frames = 1;        // Keep a note of frames for performance measure
 
         Graphics2D g;
         stop = false;
 
         // Create our own buffer
         buffer = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
-        bg = (Graphics2D)buffer.createGraphics();
+        bg = (Graphics2D) buffer.createGraphics();
         bg.setClip(0, 0, getWidth(), getHeight());
 
         while (!stop) {
@@ -133,19 +136,20 @@ public abstract class GameCore extends JFrame implements KeyListener {
             update(elapsedTime);
 
             // Get the current graphics device
-            g = (Graphics2D)getGraphics();
+            g = (Graphics2D) getGraphics();
 
-
-            if (g != null)
-            {
+            if (g != null) {
                 draw(bg);
-                g.drawImage(buffer,null,0,0);
+                g.drawImage(buffer, null, 0, 0);
             }
 
             frames++;
 
             // take a nap
-            try { Thread.sleep(10); } catch (InterruptedException ex) { }
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException ex) {
+            }
         }
         System.exit(0);
     }
@@ -153,12 +157,9 @@ public abstract class GameCore extends JFrame implements KeyListener {
     /**
      * @return The current frames per second (FPS)
      */
-    public float getFPS()
-    {
+    public float getFPS() {
         lastTime = System.currentTimeMillis();
-        //if (currTime - startTime <= 0) return 0.0f;
-        //return (float)frames/((currTime - startTime)/1000.0f);
-        return (float)frames/(elapsedTime/1000.0f);
+        return (float) frames / (currTime / 1000.0f);
     }
 
     /**
@@ -166,20 +167,21 @@ public abstract class GameCore extends JFrame implements KeyListener {
      * pressed. If you override this method, make sure you allow the user
      * to stop the game.
      */
-    public void keyReleased(KeyEvent e)
-    {
+    public void keyReleased(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_ESCAPE) stop();
     }
 
     /**
      * Handler for the keyPressed event (empty)
      */
-    public void keyPressed(KeyEvent e) { }
+    public void keyPressed(KeyEvent e) {
+    }
 
     /**
      * Handler for the keyTyped event (empty)
      */
-    public void keyTyped(KeyEvent e) {	}
+    public void keyTyped(KeyEvent e) {
+    }
 
     /**
      * Updates the state of the game/animation based on the
