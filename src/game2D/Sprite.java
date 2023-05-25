@@ -8,13 +8,9 @@ import java.awt.image.BufferedImage;
  * This class provides the functionality for a moving animated image or Sprite.
  *
  * @author David Cairns
+ * @author 2925642
  */
 public class Sprite {
-
-    public static final int TOP = 0;
-    public static final int BOTTOM = 1;
-    public static final int LEFT = 2;
-    public static final int RIGHT = 3;
 
     // The draw offset associated with this sprite. Used to draw it
     // relative to specific on screen position (usually the player)
@@ -40,49 +36,18 @@ public class Sprite {
     // The scale to draw the sprite at where 1 equals normal size
     private double xscale;
     private double yscale;
-
-    public long getLastAttack() {
-        return lastAttack;
-    }
-
-    public boolean wasAttacked = false;
-
-    public boolean isWasAttacked() {
-        return wasAttacked;
-    }
-
-    public void setWasAttacked(boolean wasAttacked) {
-        this.wasAttacked = wasAttacked;
-    }
-
-    public void setLastAttack(long lastAttack) {
-        this.lastAttack = lastAttack;
-    }
-
     private long lastAttack = -1;
 
-    // The rotation to apply to the sprite image
-    private double rotation;
+    private double rotation; // The rotation to apply to the sprite image
 
-    // If render is 'true', the sprite will be drawn when requested
-    private boolean render;
-    boolean weapon = false;
+    private boolean render; // If render is 'true', the sprite will be drawn when requested
 
-    public boolean isWeapon() {
-        return weapon;
-    }
-
-    public void setWeapon(boolean weapon) {
-        this.weapon = weapon;
-    }
-
-    private boolean flipped, onGround, jump, moveRight, moveLeft, attack, hasWeapon = false;
-
-    private boolean alive = true;
-
-    int health = 4;
-
-    int damage = 1;
+    // The following variables are used to control the sprite's movement and actions
+    private boolean flipped, flippedVertically, onGround, jump, moveRight, moveLeft, attack, hasWeapon, stationary;
+    private boolean alive = true; // If the sprite is alive or not
+    int health = 1; // base health of default sprite
+    final int MAX_HEALTH = 50; // maximum health of any sprite
+    int damage = 1; // base damage of default sprite
 
     /**
      * Creates a new Sprite object with the specified Animation.
@@ -114,8 +79,6 @@ public class Sprite {
     public void setAnimationFrame(int frame) {
         anim.setAnimationFrame(frame);
     }
-
-
 
     /**
      * Pauses the animation at its current frame. Note that the
@@ -184,67 +147,275 @@ public class Sprite {
             radius = height / 2.0f;
     }
 
-    public int getHealth() {
-        return health;
+    /**
+     * Stops the sprites movement at the current position
+     */
+    public void stop() {
+        dx = 0;
+        dy = 0;
     }
 
-    public void setHealth(int health) {
-        this.health = health;
+    /**
+     * Gets this Sprite's current image.
+     */
+    public Image getImage() {
+        return anim.getImage();
     }
 
-    public int getDamage() {
-        return damage;
+    /**
+     * Draws the sprite with the graphics object 'g' at
+     * the current x and y co-ordinates. Scaling and rotation
+     * transforms are NOT applied.
+     */
+    public void draw(Graphics2D g) {
+        if (!render) return;
+        g.drawImage(getImage(), (int) x + xoff + getWidth() / 6, (int) y + yoff, null);
     }
 
-    public void setDamage(int damage) {
-        this.damage = damage;
+    /**
+     * Draws the sprite with the graphics object 'g' at
+     * the current x and y co-ordinates. Scaling and rotation
+     * transforms are applied to flip the sprite horizontally.
+     */
+    public void drawTransformedFlip(Graphics2D g) {
+        if (!render) return;
+
+        AffineTransform transform = new AffineTransform();
+
+        // Apply scaling to current x and y positions to
+        // ensure shifted left and up when flipped due to scaling.
+        float shiftx = 0;
+        float shifty = 0;
+        if (xscale < 0) shiftx = getWidth();
+        if (yscale < 0) shifty = getHeight();
+
+        transform.translate(Math.round(x) + shiftx + xoff + getWidth() * 0.75, Math.round(y) + shifty + yoff);
+        transform.scale(getScaleX(), getScaleY());
+        transform.rotate(rotation, getImage().getWidth(null) / 6, getImage().getHeight(null) / 2);
+        transform.scale(-1, 1); // flip horizontally
+        // Apply transform to the image and draw it
+        g.drawImage(getImage(), transform, null);
     }
 
+    /**
+     * Draws the sprite with the graphics object 'g' at
+     * the current x and y co-ordinates. Scaling and rotation
+     * transforms are applied to flip the sprite vertically.
+     */
+    public void drawTransformedFlipVertical(Graphics2D g) {
+        if (!render) return;
 
+        AffineTransform transform = new AffineTransform();
+
+        // Apply scaling to current x and y positions to
+        // ensure shifted left and up when flipped due to scaling.
+        float shiftx = 0;
+        float shifty = 0;
+        if (xscale < 0) shiftx = getWidth();
+        if (yscale < 0) shifty = getHeight();
+
+        // Add the image height to the vertical translation
+        transform.translate(Math.round(x) + shiftx + xoff + getWidth() / 6, Math.round(y) + shifty + yoff + getImage().getHeight(null));
+        transform.scale(getScaleX(), getScaleY());
+        transform.rotate(getRotation(), getImage().getWidth(null) / 6, getImage().getHeight(null) / 2);
+        transform.scale(1, -1); // flip vertically
+        // Apply transform to the image and draw it
+        g.drawImage(getImage(), transform, null);
+    }
+
+    /**
+     * Draws the bounding box of this sprite using the graphics object 'g' and
+     * the currently selected foreground colour.
+     */
+    public void drawBoundingBox(Graphics2D g) {
+        if (!render) return;
+        Image img = getImage();
+        g.drawRect((int) x + xoff + getWidth() / 4, (int) y + yoff, (img.getWidth(null) / 2), img.getHeight(null));
+    }
+
+    /**
+     * Draws the bounding circle of this sprite using the graphics object 'g' and
+     * the currently selected foreground colour.
+     */
+    public void drawBoundingCircle(Graphics2D g) {
+        if (!render) return;
+
+        Image img = getImage();
+
+        g.drawArc((int) x + xoff - (img.getWidth(null) / 4), (int) y + yoff, img.getWidth(null), img.getHeight(null), 0, 360);
+    }
+
+    /**
+     * Gets the bounding circle of this sprite.
+     * Tried to get bounding circle / oval collision working but it didn't work.
+     */
+    public Circle getBoundingCircle() {
+        int radius = getImage().getWidth(null) / 4;
+        int x = (int) (this.x + xoff - radius);
+        int y = (int) (this.y + yoff - radius);
+        return new Circle(x, y, radius);
+    }
+
+    /**
+     * Hide the sprite.
+     */
+    public void hide() {
+        render = false;
+    }
+
+    /**
+     * Show the sprite
+     */
+    public void show() {
+        render = true;
+    }
+
+    /**
+     * Set an x & y offset to use when drawing the sprite.
+     * Note this does not affect its actual position, just
+     * moves the drawn position.
+     */
+    public void setOffsets(int x, int y) {
+        xoff = x;
+        yoff = y;
+    }
+
+    /**
+     * Get onGround boolean
+     */
+    public boolean isOnGround() {
+        return onGround;
+    }
+
+    /**
+     * Set onGround boolean
+     */
+    public void setOnGround(boolean b) {
+        onGround = b;
+    }
+
+    /**
+     * Get the bounding box of this sprite.
+     */
+    public Rectangle getBoundingBox() {
+        return new Rectangle((int) x + xoff + getWidth() / 2, (int) y + yoff, ((getWidth() / 2)), getHeight());
+    }
+
+    /**
+     * Get the boolean of whether the sprite is colliding with another sprite.
+     */
+    public boolean collidesWith(Sprite s2) {
+        return getBoundingBox().intersects(s2.getBoundingBox());
+    }
+
+    /**
+     * Get the boolean of whether the sprite is stationary.
+     */
+    public boolean isStationary() {
+        return stationary;
+    }
+
+    /**
+     * Set the boolean of whether the sprite is stationary.
+     */
+    public void setStationary(boolean b) {
+        stationary = b;
+    }
+
+    /**
+     * set the boolean of whether the sprite is flipped vertically.
+     */
+    public void setFlippedVertically(boolean b) {
+        flippedVertically = b;
+    }
+
+    /**
+     * get the boolean of whether the sprite is flipped vertically.
+     */
+    public boolean isFlippedVertically() {
+        return flippedVertically;
+    }
+
+    /**
+     * Get the boolean of whether the sprite has a weapon
+     */
     public boolean isHasWeapon() {
         return hasWeapon;
     }
 
+    /**
+     * Set the boolean of whether the sprite has a weapon
+     */
     public void setHasWeapon(boolean hasWeapon) {
         this.hasWeapon = hasWeapon;
     }
 
+    /**
+     * Get the boolean of whether the sprite is alive
+     */
     public boolean isAlive() {
         return alive;
     }
 
+    /**
+     * Set the boolean of whether the sprite is alive
+     */
     public void setAlive(boolean alive) {
         this.alive = alive;
     }
 
+    /**
+     * Get the boolean of whether the sprite is jumping
+     */
     public boolean isJump() {
         return jump;
     }
 
+    /**
+     * Set the boolean of whether the sprite is jumping
+     */
     public void setJump(boolean jump) {
         this.jump = jump;
     }
 
+    /**
+     * Get the boolean of whether the sprite is moving right
+     */
     public boolean isMoveRight() {
         return moveRight;
     }
 
+    /**
+     * Set the boolean of whether the sprite is moving right
+     */
     public void setMoveRight(boolean moveRight) {
         this.moveRight = moveRight;
     }
 
+    /**
+     * Get the boolean of whether the sprite is moving left
+     */
     public boolean isMoveLeft() {
         return moveLeft;
     }
 
+    /**
+     * Set the boolean of whether the sprite is moving left
+     */
     public void setMoveLeft(boolean moveLeft) {
         this.moveLeft = moveLeft;
     }
 
+    /**
+     * Get the boolean of whether the sprite is attacking
+     */
     public boolean isAttack() {
         return attack;
     }
 
+    /**
+     * Set the boolean of whether the sprite is attacking
+     */
     public void setAttack(boolean attack) {
         this.attack = attack;
     }
@@ -285,20 +456,75 @@ public class Sprite {
         setY(y);
     }
 
+    /**
+     * Sets the flipped state of this sprite.
+     */
     public void setFlipped(boolean f) {
         flipped = f;
     }
 
+    /**
+     * Gets the flipped state of this sprite.
+     */
     public boolean isFlipped() {
         return flipped;
     }
 
-    public void shiftX(float shift) {
-        this.x += shift;
+    /**
+     * Gets the MAX_HEALTH of this sprite.
+     */
+    public int getMAX_HEALTH() {
+        return MAX_HEALTH;
     }
 
-    public void shiftY(float shift) {
-        this.y += shift;
+    /**
+     * Gets the last attack time of this sprite in milliseconds.
+     */
+    public long getLastAttack() {
+        return lastAttack;
+    }
+
+    /**
+     * Sets the last attack time of this sprite in milliseconds.
+     */
+    public void setLastAttack(long lastAttack) {
+        this.lastAttack = lastAttack;
+    }
+
+    /**
+     * gets the current health of the sprite
+     *
+     * @return health
+     */
+    public int getHealth() {
+        return health;
+    }
+
+    /**
+     * sets the current health of the sprite
+     *
+     * @param health
+     */
+    public void setHealth(int health) {
+        this.health = health;
+    }
+
+    /**
+     * gets the damage of the sprite
+     *
+     * @return damage
+     */
+    public int getDamage() {
+        return damage;
+    }
+
+    /**
+     * sets the damage of the sprite
+     *
+     * @param damage
+     */
+    public void setDamage(int damage) {
+        this.damage = damage;
     }
 
     /**
@@ -429,177 +655,5 @@ public class Sprite {
         return Math.toDegrees(rotation);
     }
 
-    /**
-     * Stops the sprites movement at the current position
-     */
-    public void stop() {
-        dx = 0;
-        dy = 0;
-    }
 
-    /**
-     * Gets this Sprite's current image.
-     */
-    public Image getImage() {
-        return anim.getImage();
-    }
-
-    /**
-     * Draws the sprite with the graphics object 'g' at
-     * the current x and y co-ordinates. Scaling and rotation
-     * transforms are NOT applied.
-     */
-    public void draw(Graphics2D g) {
-        if (!render) return;
-
-        g.drawImage(getImage(), (int) x + xoff, (int) y + yoff, null);
-    }
-
-    /**
-     * Draws the bounding box of this sprite using the graphics object 'g' and
-     * the currently selected foreground colour.
-     */
-    public void drawBoundingBox(Graphics2D g) {
-        if (!render) return;
-        Image img = getImage();
-        g.drawRect((int) x + xoff, (int) y + yoff, (img.getWidth(null) / 2), img.getHeight(null));
-    }
-
-    public void drawBounds(Graphics2D g) {
-        if (!render) return;
-        Image img = getImage();
-
-        int xCoord, yCoord;
-        if (flipped) {
-            xCoord = (int) (x + xoff - img.getWidth(null) * xscale + (img.getWidth(null) / 2));
-        } else {
-            xCoord = (int) (x + xoff + 10);
-        }
-        yCoord = (int) (y + yoff);
-
-        g.drawRect(xCoord, yCoord, (int) (img.getWidth(null) * xscale), (int) (img.getHeight(null) * yscale));
-    }
-
-    public Rectangle getKnifeBounds() {
-        Image img = getImage();
-        int xCoord, yCoord;
-        if (flipped) {
-            xCoord = (int) (x + xoff - img.getWidth(null) * xscale + (img.getWidth(null) / 2));
-        } else {
-            xCoord = (int) (x + xoff + 10);
-        }
-        yCoord = (int) (y + yoff);
-        return new Rectangle(xCoord, yCoord, (int) (img.getWidth(null) * xscale), (int) (img.getHeight(null) * yscale));
-    }
-
-
-    /**
-     * Draws the bounding circle of this sprite using the graphics object 'g' and
-     * the currently selected foreground colour.
-     */
-    public void drawBoundingCircle(Graphics2D g) {
-        if (!render) return;
-
-        Image img = getImage();
-
-        g.drawArc((int) x + xoff - (img.getWidth(null) / 4), (int) y + yoff, img.getWidth(null), img.getHeight(null), 0, 360);
-    }
-
-    public Circle getBoundingCircle() {
-        int radius = getImage().getWidth(null) / 4;
-        int x = (int) (this.x + xoff - radius);
-        int y = (int) (this.y + yoff - radius);
-        return new Circle(x, y, radius);
-    }
-
-    /**
-     * Draws the sprite with the graphics object 'g' at
-     * the current x and y co-ordinates with the current scaling
-     * and rotation transforms applied.
-     *
-     * @param g The graphics object to draw to,
-     */
-    public void drawTransformed(Graphics2D g) {
-        if (!render) return;
-
-        AffineTransform transform = new AffineTransform();
-
-        // Apply scaling to current x and y positions to
-        // ensure shifted left and up when flipped due to scaling.
-        float shiftx = 0;
-        float shifty = 0;
-        if (xscale < 0) shiftx = getWidth();
-        if (yscale < 0) shifty = getHeight();
-
-        transform.translate(Math.round(x) + shiftx + xoff, Math.round(y) + shifty + yoff);
-        transform.scale(xscale, yscale);
-        transform.rotate(rotation, getImage().getWidth(null) / 2, getImage().getHeight(null) / 2);
-        // Apply transform to the image and draw it
-        g.drawImage(getImage(), transform, null);
-    }
-
-    public void drawTransformedFlip(Graphics2D g) {
-        if (!render) return;
-
-        AffineTransform transform = new AffineTransform();
-
-        // Apply scaling to current x and y positions to
-        // ensure shifted left and up when flipped due to scaling.
-        float shiftx = 0;
-        float shifty = 0;
-        if (xscale < 0) shiftx = getWidth();
-        if (yscale < 0) shifty = getHeight();
-
-        transform.translate(Math.round(x) + shiftx + xoff + (getWidth() / 2), Math.round(y) + shifty + yoff);
-        transform.scale(xscale, yscale);
-        transform.rotate(rotation, getImage().getWidth(null) / 2, getImage().getHeight(null) / 2);
-        transform.scale(-1, 1); // flip horizontally
-        // Apply transform to the image and draw it
-        g.drawImage(getImage(), transform, null);
-    }
-
-    /**
-     * Hide the sprite.
-     */
-    public void hide() {
-        render = false;
-    }
-
-    /**
-     * Show the sprite
-     */
-    public void show() {
-        render = true;
-    }
-
-    /**
-     * Set an x & y offset to use when drawing the sprite.
-     * Note this does not affect its actual position, just
-     * moves the drawn position.
-     */
-    public void setOffsets(int x, int y) {
-        xoff = x;
-        yoff = y;
-    }
-
-
-    public Rectangle getBounds() {
-        return new Rectangle((int) x + xoff, (int) y + yoff, getWidth(), getHeight());
-    }
-
-    public boolean isOnGround() {
-        return onGround;
-    }
-
-    public void setOnGround(boolean b) {
-        onGround = b;
-    }
-
-    public Rectangle getBoundingBox() {
-        return new Rectangle((int) x + xoff, (int) y + yoff, ((getWidth() / 2)), getHeight());
-    }
-
-    public boolean collidesWith(Sprite s2) {
-        return getBoundingBox().intersects(s2.getBoundingBox());
-    }
 }
